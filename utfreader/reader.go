@@ -1,11 +1,17 @@
-package main
+// utfreader is a package that detects the encoding of a reader
+// and provides a new reader that converts the input to UTF-8.
+// There are two types of normalization forms: NFC and NFD.
+package utfreader
 
 import (
 	"bufio"
 	"io"
+	"unicode/utf8"
 
 	"github.com/saintfish/chardet"
 	"golang.org/x/net/html/charset"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 // isAscii returns false if there is a non-ASCII character in the data.
@@ -16,6 +22,25 @@ func isAscii(data []byte) bool {
 		}
 	}
 	return true
+}
+
+// last start returns the index of the last start of a UTF-8 character.
+func lastStart(data []byte) int {
+	end := len(data)
+	lim := end - utf8.UTFMax
+	if lim < 0 {
+		lim = 0
+	}
+	for start := end - 1; start >= lim; start-- {
+		if utf8.RuneStart(data[start]) {
+			return start
+		}
+	}
+	return end
+}
+
+func isUTF8(data []byte) bool {
+	return utf8.Valid(data[:lastStart(data)])
 }
 
 // guessUTF16 returns the "UTF-16 LE", "UTF-16 BE" if it looks like a valid UTF-16 or UTF-8.
@@ -60,6 +85,9 @@ func detectCharset(data []byte) (encoding string) {
 	if isAscii(data) {
 		return ""
 	}
+	if isUTF8(data) {
+		return "UTF-8"
+	}
 	encoding = guessUTF16(data)
 	if encoding != "" {
 		return encoding
@@ -72,23 +100,33 @@ func detectCharset(data []byte) (encoding string) {
 	return result.Charset
 }
 
-// utfReader returns a reader that converts the input to UTF-8
+type NormalizationForm int
+
+const (
+	NFD NormalizationForm = iota // Canonical Decomposition
+	NFC                          // Canonical Decomposition followed by Canonical Composition
+)
+
+// New returns a reader that converts the input to UTF-8
 // if it is not already encoded in UTF-8.
 // If an error occurs it returns the original reader.
-func utfReader(r io.Reader) io.Reader {
+func New(r io.Reader, nor NormalizationForm) io.Reader {
 	// New bufferedReader
 	br := bufio.NewReader(r)
 
 	// Peak the first 4096 bytes (at most)
 	beginning, _ := br.Peek(4 * 1024)
 	encoding := detectCharset(beginning)
-	if encoding == "" || encoding == "UTF-8" {
-		return br
+	e, _ := charset.Lookup(encoding)
+	var trs []transform.Transformer
+	if encoding != "" && encoding != "UTF-8" && e != nil {
+		trs = append(trs, e.NewDecoder())
+	}
+	if nor == NFC {
+		trs = append(trs, norm.NFC)
+	} else {
+		trs = append(trs, norm.NFD)
 	}
 	// Convert the reader to UTF-8
-	utfReader, err := charset.NewReaderLabel(encoding, br)
-	if err != nil {
-		return br
-	}
-	return utfReader
+	return transform.NewReader(br, transform.Chain(trs...))
 }
