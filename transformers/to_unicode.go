@@ -84,10 +84,10 @@ var latexToUnicode = map[string]latexSpecial{
 	"^":  {latexSpecialNonLetterAccent, 0x302}, // circumflex : â
 	"~":  {latexSpecialNonLetterAccent, 0x303}, // tilde : ã
 	"=":  {latexSpecialNonLetterAccent, 0x304}, // macron : ā
-	"u":  {latexSpecialNonLetterAccent, 0x306}, // breve : ă
 	".":  {latexSpecialNonLetterAccent, 0x307}, // dot-over : ġ
 	"\"": {latexSpecialNonLetterAccent, 0x308}, // two dots (umlaut, diaeresis) : ä
 	// Letter accents
+	"u": {latexSpecialLetterAccent, 0x306}, // breve : ă
 	"r": {latexSpecialLetterAccent, 0x30A}, // ring : å
 	"H": {latexSpecialLetterAccent, 0x30B}, // double acute (long Hungarian umlaut) : ő
 	"v": {latexSpecialLetterAccent, 0x30C}, // háček : č
@@ -114,7 +114,7 @@ var latexToUnicode = map[string]latexSpecial{
 var noneLatexSpecial = latexSpecial{spType: latexSpecialNone}
 
 const (
-	nonletteraccent string = "`'^~=.u\""
+	nonletteraccent string = "`'^~=.\""
 	firstOfTwo      string = "Aes" // no need to put Oo because they are letter accents
 )
 

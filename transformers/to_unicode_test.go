@@ -80,6 +80,10 @@ func TestGetSpecial(t *testing.T) {
 		{"c", latexSpecial{spType: latexSpecialLetterAccent, utf8: 0x327}, 1, true},
 		{"c ", latexSpecial{spType: latexSpecialLetterAccent, utf8: 0x327}, 2, false},
 		{"c{}", latexSpecial{spType: latexSpecialLetterAccent, utf8: 0x327}, 1, false},
+		{"u", latexSpecial{spType: latexSpecialLetterAccent, utf8: 0x306}, 1, true},
+		{"u ", latexSpecial{spType: latexSpecialLetterAccent, utf8: 0x306}, 2, false},
+		{"u{", latexSpecial{spType: latexSpecialLetterAccent, utf8: 0x306}, 1, false},
+		{"up", latexSpecial{spType: latexSpecialNone}, 0, false},
 	}
 
 	for i, d := range data {
@@ -162,6 +166,7 @@ func TestToUnicodeAccents_Transform(t *testing.T) {
 		{100, "\\'\\c{c}", true, []byte{'c', 0xCC, 0xA7, 0xCC, 0x81}},
 		{100, "\\`\\L", true, []byte{0xC5, 0x81, 0xCC, 0x80}},
 		{100, "{\\`\\L}", true, []byte{0xC5, 0x81, 0xCC, 0x80}},
+		{100, "\\up", true, []byte("\\up")},
 	}
 
 	for i, d := range data {
