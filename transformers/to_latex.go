@@ -108,7 +108,7 @@ func (t *toLaTeXAccents) adjust() {
 // it returns true if the whole rune was written
 func writeLaTeXRune(dst []byte, r rune, nDst *int) bool {
 	if s, ok := unicodeLettersToLaTeX[r]; ok {
-		return writeString(dst, s, nDst)
+		return write(dst, s, nDst)
 	}
 	return writeRune(dst, r, nDst)
 }
@@ -127,10 +127,10 @@ func (t *toLaTeXAccents) writeLaTeXLetter(dst []byte, nDst *int, inGroup bool) (
 		}
 	}()
 	if s, ok := unicodeLettersToLaTeX[t.letter]; ok {
-		return writeString(dst, s, nDst)
+		return write(dst, s, nDst)
 	}
 	if inGroup {
-		return writeString(dst, fmt.Sprintf("{%c}", t.letter), nDst)
+		return write(dst, fmt.Sprintf("{%c}", t.letter), nDst)
 	}
 	return writeLaTeXRune(dst, t.letter, nDst)
 }
@@ -148,7 +148,7 @@ func (t *toLaTeXAccents) writeLaTeXAccent(dst []byte, nDst *int) (done bool) {
 		if !writeRune(dst, '\\', &n) || !writeRune(dst, t.accents[i], &n) {
 			return false
 		}
-		inGroup = isLatinRune(t.accents[i])
+		inGroup = isLatin(t.accents[i])
 	}
 	// write the letter (and reset it)
 	if !t.writeLaTeXLetter(dst, &n, inGroup) {

@@ -35,7 +35,7 @@ func TestWriteByte(t *testing.T) {
 	}
 }
 
-func TestWriteBytes(t *testing.T) {
+func TestWrite(t *testing.T) {
 	data := []struct {
 		dst    []byte // destination slice
 		src    []byte // source byte to write
@@ -52,7 +52,7 @@ func TestWriteBytes(t *testing.T) {
 	}
 
 	for i, d := range data {
-		ok := writeBytes(d.dst, d.src, &d.ndst)
+		ok := write(d.dst, d.src, &d.ndst)
 		if ok != d.expok {
 			t.Errorf("test %d: expected ok=%v, got ok=%v", i, d.expok, ok)
 		}
@@ -82,7 +82,7 @@ func TestWriteString(t *testing.T) {
 	}
 
 	for i, d := range data {
-		ok := writeString(d.dst, d.src, &d.ndst)
+		ok := write(d.dst, d.src, &d.ndst)
 		if ok != d.expok {
 			t.Errorf("test %d: expected ok=%v, got ok=%v", i, d.expok, ok)
 		}
@@ -145,7 +145,7 @@ func TestIsLatinByte(t *testing.T) {
 	}
 
 	for i, d := range data {
-		if isLatinByte(d.r) != d.exp {
+		if isLatin(d.r) != d.exp {
 			t.Errorf("test %d: expected %v, got %v", i, d.exp, !d.exp)
 		}
 	}

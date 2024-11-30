@@ -140,7 +140,7 @@ func getSpecial(src []byte) (ls latexSpecial, n int, needMore bool) {
 	// get the longest possible latex macro name
 	i := 0
 	for ; i < len(src); i++ {
-		if !isLatinByte(src[i]) && src[i] != '@' {
+		if !isLatin(src[i]) && src[i] != '@' {
 			break
 		}
 	}
@@ -190,7 +190,7 @@ func getLetter(src []byte) (l rune, n int, needMore bool) {
 		if len(src) == 2 {
 			return 0, 0, true
 		}
-		if isLatinByte(src[1]) && src[2] == '}' {
+		if isLatin(src[1]) && src[2] == '}' {
 			return rune(src[1]), 3, false
 		}
 		if src[1] == '\\' {
@@ -205,7 +205,7 @@ func getLetter(src []byte) (l rune, n int, needMore bool) {
 		}
 		return 0, 0, false
 	}
-	if !isLatinByte(src[0]) {
+	if !isLatin(src[0]) {
 		// we do not treat latexSpecialLetter here
 		return 0, 0, false
 	}
@@ -235,7 +235,7 @@ func (t *toUnicodeAccents) Transform(dst, src []byte, atEOF bool) (nDst, nSrc in
 			if i < 0 {
 				i = len(src) - nSrc
 			}
-			if !writeBytes(dst, src[nSrc:nSrc+i], &nDst) {
+			if !write(dst, src[nSrc:nSrc+i], &nDst) {
 				// not enough space in dst
 				return nDst, nSrc, transform.ErrShortDst
 			}
