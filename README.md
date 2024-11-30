@@ -1,5 +1,5 @@
 # laxents
-Accents translater between UTF-8 and LaTeX.
+Accents translator between UTF-8 and LaTeX written in Golang.
 
 ## Usage
 
