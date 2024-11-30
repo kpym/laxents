@@ -14,7 +14,10 @@ import (
 // ToUnicode converts LaTeX accents to Unicode characters.
 func ToUnicode(out io.Writer, in io.Reader) error {
 	in = utf8reader.New(in,
-		utf8reader.WithTransform(norm.NFC, transformers.ToUnicodeAccents(), norm.NFC))
+		utf8reader.WithTransform(
+			norm.NFC,
+			transformers.ToUnicodeAccents(),
+			norm.NFC))
 
 	_, err := io.Copy(out, in)
 	return err
@@ -23,7 +26,10 @@ func ToUnicode(out io.Writer, in io.Reader) error {
 // ToLaTeX converts Unicode characters to LaTeX accents.
 func ToLaTeX(out io.Writer, in io.Reader) error {
 	in = utf8reader.New(in,
-		utf8reader.WithTransform(norm.NFD, transformers.ToLaTeXAccents(), norm.NFC))
+		utf8reader.WithTransform(
+			norm.NFD,
+			transformers.ToLaTeXAccents(),
+			norm.NFC))
 
 	_, err := io.Copy(out, in)
 	return err
